@@ -9,7 +9,9 @@ public class Main {
         // initialize container
         AnnotationConfigApplicationContext applicationContext =
                 new AnnotationConfigApplicationContext("com.rhtech.newstack");
-        ((Undertow)applicationContext.getBean("undertow")).start();
+
+        Undertow server = ((Undertow)applicationContext.getBean("undertow"));
+        server.start();
     }
 
 }

@@ -1,13 +1,18 @@
 package com.rhtech.newstack.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+
+import javax.sql.DataSource;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -25,6 +30,18 @@ public class ServerConfig {
   public RoutingHandler createRoutingHandler() {
     RoutingHandler routingHandler = new RoutingHandler();
     return routingHandler;
+  }
+
+  @Bean
+  public HikariConfig createHikariConfig() {
+    HikariConfig config = new HikariConfig();
+    //@todo do set properties here
+    return config;
+  }
+
+  @Bean
+  public DataSource createDataSource(HikariConfig hikariConfig) {
+    return new HikariDataSource(hikariConfig);
   }
 
   @Bean

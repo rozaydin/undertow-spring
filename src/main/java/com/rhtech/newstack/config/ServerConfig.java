@@ -11,6 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -35,13 +36,23 @@ public class ServerConfig {
   @Bean
   public HikariConfig createHikariConfig() {
     HikariConfig config = new HikariConfig();
-    //@todo do set properties here
+    config.setJdbcUrl("jdbc:mysql://localhost:3306/world");
+    config.setUsername("user");
+    config.setPassword("password");
+    config.addDataSourceProperty("cachePrepStmts", "true");
+    config.addDataSourceProperty("prepStmtCacheSize", "250");
+    config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
     return config;
   }
 
   @Bean
   public DataSource createDataSource(HikariConfig hikariConfig) {
     return new HikariDataSource(hikariConfig);
+  }
+
+  @Bean
+  public JdbcTemplate createJdbcTemplate(DataSource dataSource) {
+    return new JdbcTemplate(dataSource);
   }
 
   @Bean

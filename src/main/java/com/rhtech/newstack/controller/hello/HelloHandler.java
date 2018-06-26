@@ -1,4 +1,4 @@
-package com.rhtech.newstack.handler.hello;
+package com.rhtech.newstack.controller.hello;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;

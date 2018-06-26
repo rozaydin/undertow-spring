@@ -1,4 +1,4 @@
-package com.rhtech.newstack.handler;
+package com.rhtech.newstack.controller;
 
 import io.undertow.server.HttpHandler;
 

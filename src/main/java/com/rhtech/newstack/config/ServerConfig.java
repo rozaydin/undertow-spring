@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +23,12 @@ public class ServerConfig {
       RoutingHandler handler,
       @Value("${server.hostname}") String hostname,
       @Value("${server.port}") int port) {
-    return Undertow.builder().addHttpListener(port, hostname).setHandler(handler).build();
+    return Undertow.builder()
+        .setIoThreads(1)
+        .setWorkerThreads(10)
+        .addHttpListener(port, hostname)
+        .setHandler(handler)
+        .build();
   }
 
   @Bean(name = "routingHandler")

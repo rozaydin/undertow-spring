@@ -21,7 +21,6 @@ public class CountryController {
   }
 
   // Handlers
-
   private static HttpHandler createGetCountryByCode2HttpHandler(CountryService countryService) {
 
     return exchange -> {

@@ -1,9 +1,16 @@
 package com.rhtech.newstack.config;
 
 import com.rhtech.newstack.handler.GlobalExceptionHandler;
+import com.rhtech.newstack.security.SimpleIdentityManager;
+import com.rhtech.newstack.security.JWTAuthentication;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.undertow.Undertow;
+import io.undertow.security.api.AuthenticationMode;
+import io.undertow.security.handlers.AuthenticationCallHandler;
+import io.undertow.security.handlers.AuthenticationConstraintHandler;
+import io.undertow.security.handlers.AuthenticationMechanismsHandler;
+import io.undertow.security.handlers.SecurityInitialHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +23,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -43,8 +51,15 @@ public class ServerConfig {
   @Bean(name = "processingChain")
   public HttpHandler createProcessingChain(RoutingHandler routingHandler) {
     // create processing chain for the application
-    GlobalExceptionHandler handler = new GlobalExceptionHandler(routingHandler);
-    return handler;
+
+    // authentication handlers
+    HttpHandler handler = new AuthenticationCallHandler(routingHandler);
+    handler = new AuthenticationConstraintHandler(handler);
+    handler = new AuthenticationMechanismsHandler(handler, Collections.singletonList(new JWTAuthentication()));
+    handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE,new SimpleIdentityManager(), handler);
+
+    // global exception handler
+    return new GlobalExceptionHandler(handler);
   }
 
   @Bean(name = "routingHandler")

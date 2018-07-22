@@ -9,6 +9,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.jose4j.lang.JoseException;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -37,18 +38,22 @@ public class LoginHandler implements HttpHandler {
                 boolean loginResult = _exchange.getSecurityContext().login(loginRequestData.getUsername(), loginRequestData.getPassword());
                 if (loginResult) {
                     log.info("login for user: {}, is successful, generating login token");
+                    // generate jwt token
+                    String jwtToken = jwtService.generateJwt(_exchange.getSecurityContext());
                     // return jwt token
                     _exchange.setStatusCode(200);
-                    _exchange.getResponseSender().send(gson.toJson(new LoginResponseData(jwtService.generateJwt(_exchange.getSecurityContext()))));
+                    _exchange.getResponseSender().send(gson.toJson(new LoginResponseData(jwtToken)));
                 } else {
                     // login failed return 401
                     _exchange.setStatusCode(401);
                     _exchange.getResponseSender().send("username/password is not correct!");
-
                 }
             } catch (JsonSyntaxException jse) {
                 _exchange.setStatusCode(500);
                 _exchange.getResponseSender().send(gson.toJson(new Error("Failed to parse request body, not a valid login request", jse)));
+            } catch (JoseException je) {
+                _exchange.setStatusCode(500);
+                _exchange.getResponseSender().send(gson.toJson(new Error("Failed to generate jwt for user", je)));
             }
         }, (_exchange, ioExc) -> {
             // error callback

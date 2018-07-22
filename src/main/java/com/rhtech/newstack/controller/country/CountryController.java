@@ -1,6 +1,6 @@
 package com.rhtech.newstack.controller.country;
 
-import com.rhtech.newstack.model.entity.Country;
+import com.rhtech.newstack.model.Country;
 import com.rhtech.newstack.service.CountryService;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;

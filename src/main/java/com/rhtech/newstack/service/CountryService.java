@@ -1,6 +1,6 @@
 package com.rhtech.newstack.service;
 
-import com.rhtech.newstack.model.entity.Country;
+import com.rhtech.newstack.model.Country;
 import com.rhtech.newstack.repository.CountryRepository;
 import org.springframework.stereotype.Service;
 

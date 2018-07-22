@@ -1,6 +1,6 @@
 package com.rhtech.newstack.repository;
 
-import com.rhtech.newstack.model.entity.Country;
+import com.rhtech.newstack.model.Country;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;

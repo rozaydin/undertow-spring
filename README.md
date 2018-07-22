@@ -17,4 +17,6 @@ when compared with classic springboot projects.  This project does use only most
 for Spring DI and for lombok when necessary. I do strongly believe annotations are making an application
 hard to understand and debug. 
 
+Please feel free to use it as you like ...
+
   

@@ -6,9 +6,17 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import lombok.extern.slf4j.Slf4j;
+import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.jwt.consumer.JwtConsumer;
 
 @Slf4j
 public class JWTAuthentication implements AuthenticationMechanism {
+
+    private final JwtConsumer jwtConsumer;
+
+    public JWTAuthentication(JwtConsumer jwtConsumer) {
+        this.jwtConsumer = jwtConsumer;
+    }
 
     @Override
     public AuthenticationMechanismOutcome authenticate(HttpServerExchange exchange, SecurityContext securityContext) {
@@ -23,8 +31,13 @@ public class JWTAuthentication implements AuthenticationMechanism {
             if (authorizationHeaderValue != null) {
                 String jwtToken = authorizationHeaderValue.getFirst();
                 if (jwtToken != null) {
-                    // validate token
-                    return AuthenticationMechanismOutcome.AUTHENTICATED;
+                    try {
+                        // validate token
+                        jwtConsumer.process(jwtToken);
+                        return AuthenticationMechanismOutcome.AUTHENTICATED;
+                    } catch (InvalidJwtException ijwtExc) {
+                        log.warn("jwt validation failed", ijwtExc);
+                    }
                 }
             }
             // auth failed - return auth required

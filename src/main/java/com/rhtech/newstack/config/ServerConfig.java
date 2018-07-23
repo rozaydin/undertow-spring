@@ -14,6 +14,8 @@ import io.undertow.security.handlers.AuthenticationMechanismsHandler;
 import io.undertow.security.handlers.SecurityInitialHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -56,14 +58,14 @@ public class ServerConfig {
      * @return
      */
     @Bean(name = "processingChain")
-    public HttpHandler createProcessingChain(RoutingHandler routingHandler) {
+    public HttpHandler createProcessingChain(RoutingHandler routingHandler, JwtConsumer jwtConsumer) {
         // create processing chain for the application
 
         // authentication handlers
         HttpHandler handler = new AuthenticationCallHandler(routingHandler);
         // handler = new AuthenticationConstraintHandler(handler);
         handler = new AuthenticationRequiredDecider(handler);
-        handler = new AuthenticationMechanismsHandler(handler, Collections.singletonList(new JWTAuthentication()));
+        handler = new AuthenticationMechanismsHandler(handler, Collections.singletonList(new JWTAuthentication(jwtConsumer)));
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, new SimpleIdentityManager(), handler);
         // Request Buffering
         // handler = new RequestBufferingHandler(handler, 100);
@@ -110,6 +112,19 @@ public class ServerConfig {
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(jksAlias, jksPassword.toCharArray());
         PublicKey publicKey = keyStore.getCertificate(jksAlias).getPublicKey();
         return new KeyPair(publicKey, privateKey);
+    }
+
+    @Bean
+    public JwtConsumer createJwtConsumer(KeyPair keyPair) {
+
+        JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                .setRequireJwtId()
+                .setRequireSubject()
+                .setAllowedClockSkewInSeconds(10)
+                .setVerificationKey(keyPair.getPublic())
+                .build();
+        // construct jwt consumer
+        return jwtConsumer;
     }
 
     @Bean

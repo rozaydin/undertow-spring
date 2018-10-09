@@ -42,9 +42,14 @@ public class ServerConfig {
             @Qualifier("processingChain") HttpHandler handler,
             @Value("${server.hostname}") String hostname,
             @Value("${server.port}") int port) {
+
+        final int availableCores = Runtime.getRuntime().availableProcessors();
+        final int ioThreadCount = 2 * availableCores;
+        final int workerThreadCount = 5 * availableCores;
+
         return Undertow.builder()
-                .setIoThreads(1)
-                .setWorkerThreads(10)
+                .setIoThreads(ioThreadCount)
+                .setWorkerThreads(workerThreadCount)
                 .addHttpListener(port, hostname)
                 .setHandler(handler)
                 .build();
